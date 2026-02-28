@@ -8,7 +8,7 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 # ================================================================
-# BLOCK 1: Video source (command line argument OR dialog)
+# БЛОК 1: Источник видео
 # ================================================================
 source = None
 
@@ -27,28 +27,27 @@ else:
     def select_file():
         global source
         path = filedialog.askopenfilename(
-            title="Select video file",
-            filetypes=[("Video files", "*.mp4 *.avi *.mov *.mkv"),
-                       ("All files", "*.*")]
+            title="Выбери видеофайл",
+            filetypes=[("Видео файлы", "*.mp4 *.avi *.mov *.mkv"),
+                       ("Все файлы", "*.*")]
         )
         if path:
             source = path
             dialog.destroy()
 
     dialog = ctk.CTk()
-    dialog.title("Select video source")
-    dialog.geometry("320x200")
+    dialog.title("Выбор источника видео")
+    dialog.geometry("320x250")
     dialog.resizable(False, False)
 
-    ctk.CTkLabel(dialog, text="Select video source",
+    ctk.CTkLabel(dialog, text="Выберите источник видео",
                  font=("Arial", 14)).pack(pady=15)
     camera_var = ctk.StringVar(value="0")
-    ctk.CTkLabel(dialog, text="Camera number:").pack()
+    ctk.CTkLabel(dialog, text="Номер камеры:").pack()
     ctk.CTkEntry(dialog, textvariable=camera_var, width=60).pack(pady=5)
-    ctk.CTkButton(dialog, text="Use camera",
-                  command=select_camera).pack(pady=5)
-    ctk.CTkLabel(dialog, text="-- or --").pack()
-    ctk.CTkButton(dialog, text="Select video file...",
+    ctk.CTkButton(dialog, text="Использовать камеру", command=select_camera).pack(pady=5)
+    ctk.CTkLabel(dialog, text="— или —").pack()
+    ctk.CTkButton(dialog, text="Выбрать видеофайл...",
                   command=select_file,
                   fg_color="gray",
                   hover_color="#555555").pack(pady=5)
@@ -58,7 +57,7 @@ else:
         sys.exit()
 
 # ================================================================
-# BLOCK 2: Main window, buttons, video area
+# БЛОК 2: Главное окно, кнопки, видео-область
 # ================================================================
 root = ctk.CTk()
 root.title("CV Homework")
@@ -66,12 +65,12 @@ root.title("CV Homework")
 def quit_app():
     root.quit()
 
-btn_quit = ctk.CTkButton(root, text="Exit",
+btn_quit = ctk.CTkButton(root, text="Выход",
                          fg_color="red", hover_color="#cc0000",
                          command=quit_app)
 btn_quit.pack(pady=10)
 
-btn_clear = ctk.CTkButton(root, text="Clear points (C)",
+btn_clear = ctk.CTkButton(root, text="Сбросить точки (C)",
                           fg_color="gray", hover_color="#555555",
                           command=lambda: click_points.clear())
 btn_clear.pack(pady=5)
@@ -80,7 +79,7 @@ video_label = ctk.CTkLabel(root, text="")
 video_label.pack(padx=10, pady=10)
 
 # ================================================================
-# BLOCK 3: Click points - storage and handling
+# БЛОК 3: Точки кликов — хранение и обработка (ТЗ п.2 и п.3)
 # ================================================================
 click_points = []
 
@@ -90,15 +89,12 @@ def on_click(event):
 video_label.bind('<Button-1>', on_click)
 
 # ================================================================
-# BLOCK 4: Video capture via OpenCV
+# БЛОК 4: Захват видео через OpenCV
 # ================================================================
 cap = cv2.VideoCapture(source)
-if not cap.isOpened():
-    print("Error: could not open source:", source)
-    sys.exit()
 
 # ================================================================
-# BLOCK 5: Keyboard handling - Q and C
+# БЛОК 5: Обработка клавиатуры Q и C (ТЗ п.3 и п.4)
 # ================================================================
 def on_key(event):
     if event.char.lower() == 'q':
@@ -109,7 +105,7 @@ def on_key(event):
 root.bind('<Key>', on_key)
 
 # ================================================================
-# BLOCK 6: Main frame update loop
+# БЛОК 6: Главный цикл обновления кадров
 # ================================================================
 def update_frame():
     ret, frame = cap.read()
@@ -117,24 +113,24 @@ def update_frame():
         root.quit()
         return
 
-    # Draw rectangles at click points
+    # Рисование прямоугольников по точкам кликов
     for (x, y) in click_points:
         cv2.rectangle(frame,
                       (x - 20, y - 20),
                       (x + 20, y + 20),
                       (0, 255, 0), 2)
 
-    # Convert OpenCV frame -> CustomTkinter
+    # Конвертация OpenCV → CustomTkinter
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = Image.fromarray(cv2image)
     imgtk = ImageTk.PhotoImage(image=img)
     video_label.configure(image=imgtk)
-    video_label.image = imgtk  # keep reference to prevent GC
+    video_label.image = imgtk
 
     root.after(30, update_frame)
 
 # ================================================================
-# BLOCK 7: Launch
+# БЛОК 7: Запуск
 # ================================================================
 update_frame()
 root.mainloop()
