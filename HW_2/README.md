@@ -31,7 +31,7 @@
 ## 🚀 Как запустить
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/ВАШ_НИК/CV_Homework_2.git
+   git clone https://github.com/Opium507/CV_Homework_2.git
 
 2. Установите зависимости:
     ```bash
